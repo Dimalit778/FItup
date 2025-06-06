@@ -1,0 +1,168 @@
+{
+  "tabs": {
+    "profile": "פרופיל",
+    "weight": "משקל",
+    "workouts": "אימונים",
+    "settings": "הגדרות"
+  },
+  "landing": {
+    "hero": {
+      "title": "שנה את מסע הכושר שלך",
+      "subtitle": "אימונים מונעי בינה מלאכותית, תזונה מותאמת אישית ומעקב התקדמות באפליקציה אחת"
+    },
+    "getStarted": "התחל עכשיו",
+    "signIn": "התחבר",
+    "features": {
+      "title": "כל מה שאתה צריך",
+      "subtitle": "תכונות חזקות שיעזרו לך להגיע ליעדי הכושר שלך",
+      "workouts": {
+        "title": "אימוני AI",
+        "description": "תוכניות אימון מותאמות אישית שנוצרו על ידי בינה מלאכותית"
+      },
+      "goals": {
+        "title": "מעקב יעדים",
+        "description": "הגדר ועקוב אחר יעדי הכושר שלך עם ניתוח מפורט"
+      },
+      "progress": {
+        "title": "ניתוח התקדמות",
+        "description": "הצג את ההתקדמות שלך עם גרפים יפים ותובנות"
+      },
+      "community": {
+        "title": "קהילה",
+        "description": "התחבר עם חובבי כושר בעלי דעות דומות"
+      }
+    },
+    "stats": {
+      "users": "משתמשים פעילים",
+      "workouts": "אימונים שהושלמו",
+      "satisfaction": "שיעור שביעות רצון"
+    },
+    "testimonials": {
+      "title": "מה המשתמשים שלנו אומרים",
+      "subtitle": "הצטרף לאלפי משתמשים מרוצים ששינו את חייהם"
+    },
+    "cta": {
+      "title": "מוכן להתחיל את המסע שלך?",
+      "subtitle": "הצטרף ל-FitFlow היום ושנה את שגרת הכושר שלך",
+      "button": "התחל ניסיון חינם"
+    }
+  },
+  "auth": {
+    "signIn": "התחבר",
+    "signUp": "הירשם",
+    "welcomeBack": "ברוך השב",
+    "createAccount": "צור חשבון",
+    "signInSubtitle": "התחבר כדי להמשיך את מסע הכושר שלך",
+    "signUpSubtitle": "הצטרף לאלפי משתמשים המשיגים את יעדי הכושר שלהם",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "fullName": "שם מלא",
+    "confirmPassword": "אשר סיסמה",
+    "emailPlaceholder": "הכנס את האימייל שלך",
+    "passwordPlaceholder": "הכנס את הסיסמה שלך",
+    "namePlaceholder": "הכנס את השם המלא שלך",
+    "confirmPasswordPlaceholder": "אשר את הסיסמה שלך",
+    "forgotPassword": "שכחת סיסמה?",
+    "noAccount": "אין לך חשבון?",
+    "haveAccount": "כבר יש לך חשבון?",
+    "errors": {
+      "emailRequired": "אימייל נדרש",
+      "emailInvalid": "אנא הכנס אימייל תקין",
+      "passwordRequired": "סיסמה נדרשת",
+      "passwordTooShort": "הסיסמה חייבת להיות לפחות 6 תווים",
+      "nameRequired": "שם נדרש",
+      "confirmPasswordRequired": "אנא אשר את הסיסמה שלך",
+      "passwordMismatch": "הסיסמאות אינן תואמות",
+      "loginFailed": "ההתחברות נכשלה. אנא בדוק את הפרטים שלך.",
+      "registrationFailed": "ההרשמה נכשלה. אנא נסה שוב."
+    }
+  },
+  "profile": {
+    "title": "פרופיל",
+    "personalInfo": "מידע אישי",
+    "name": "שם",
+    "age": "גיל",
+    "height": "גובה (ס״מ)",
+    "weight": "משקל (ק״ג)",
+    "activityLevel": "רמת פעילות",
+    "fitnessGoal": "יעד כושר",
+    "save": "שמור פרופיל",
+    "saved": "הפרופיל נשמר בהצלחה!",
+    "error": "שגיאה בשמירת הפרופיל",
+    "loading": "שומר...",
+    "activityLevels": {
+      "sedentary": "בישיבה",
+      "light": "פעילות קלה",
+      "moderate": "פעילות בינונית",
+      "very": "פעילות גבוהה",
+      "extra": "פעילות מאוד גבוהה"
+    },
+    "goals": {
+      "lose": "הורדה במשקל",
+      "maintain": "שמירה על משקל",
+      "gain": "עלייה במשקל",
+      "muscle": "בניית שרירים"
+    }
+  },
+  "weight": {
+    "title": "מעקב משקל",
+    "currentWeight": "משקל נוכחי",
+    "addWeight": "הוסף רישום משקל",
+    "enterWeight": "הכנס משקל (ק״ג)",
+    "add": "הוסף רישום",
+    "progress": "ההתקדמות שלך",
+    "noData": "אין נתוני משקל זמינים",
+    "error": "שגיאה בשמירת רישום המשקל",
+    "success": "רישום המשקל נוסף בהצלחה!",
+    "loading": "מוסיף רישום..."
+  },
+  "workouts": {
+    "title": "אימונים",
+    "generatePlan": "צור תוכנית אימון בבינה מלאכותית",
+    "premiumRequired": "נדרש פרימיום",
+    "premiumMessage": "שדרג לפרימיום כדי לגשת לתוכניות אימון שנוצרו בבינה מלאכותית",
+    "upgrade": "שדרג עכשיו",
+    "generating": "יוצר תוכנית אימון מותאמת אישית...",
+    "error": "שגיאה ביצירת תוכנית האימון",
+    "yourPlan": "תוכנית האימון שלך",
+    "noPlan": "אין תוכנית אימון זמינה. צור אחת כדי להתחיל!"
+  },
+  "settings": {
+    "title": "הגדרות",
+    "appearance": "מראה",
+    "darkMode": "מצב כהה",
+    "language": "שפה",
+    "subscription": "מנוי",
+    "premium": "תכונות פרימיום",
+    "managePlan": "נהל מנוי",
+    "account": "חשבון",
+    "logout": "התנתק",
+    "logoutConfirm": "האם אתה בטוח שברצונך להתנתק?"
+  },
+  "paywall": {
+    "title": "שדרג לפרימיום",
+    "subtitle": "פתח תכונות מתקדמות ותוכניות מותאמות אישית",
+    "features": {
+      "ai": "תוכניות אימון בבינה מלאכותית",
+      "nutrition": "תוכניות תזונה מותאמות אישית",
+      "analytics": "ניתוח התקדמות מתקדם",
+      "support": "תמיכה עדיפה"
+    },
+    "monthly": "חודשי",
+    "yearly": "שנתי",
+    "save": "חסוך 40%",
+    "purchase": "התחל פרימיום",
+    "restore": "שחזר רכישות",
+    "terms": "תנאי השירות",
+    "privacy": "מדיניות פרטיות",
+    "error": "הרכישה נכשלה. נסה שוב.",
+    "success": "ברוך הבא לפרימיום!"
+  },
+  "common": {
+    "cancel": "ביטול",
+    "confirm": "אישור",
+    "error": "משהו השתבש",
+    "loading": "טוען...",
+    "retry": "נסה שוב"
+  }
+}
