@@ -1,28 +1,48 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Switch, ActivityIndicator } from 'react-native';
-import { useUserProfileStore } from '../../store/userProfileStore';
-import { subscriptionService } from '../../services/subscriptionService';
-import { useAuth } from '../../contexts/AuthContext';
-import { Ionicons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
-import type { UserProfile, Gender, ActivityLevel, UserGoal } from '../../types/user';
+import { useSupabase } from "@/src/contexts/supabaseProvider";
+import { useAuth, useUser } from "@clerk/clerk-expo";
+import { Ionicons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { subscriptionService } from "../../services/subscriptionService";
+import { useUserProfileStore } from "../../store/userProfileStore";
+import type {
+  ActivityLevel,
+  Gender,
+  UserGoal,
+  UserProfile,
+} from "../../types/user";
 
 export default function ProfileScreen() {
   const { profile, updateProfile } = useUserProfileStore();
-  const { user, signOut } = useAuth();
+  const { user } = useUser();
+  const { signOut } = useAuth();
+  const { supabase, loading: supabaseLoading } = useSupabase();
   const [loading, setLoading] = useState(false);
-  const [localProfile, setLocalProfile] = useState<UserProfile>(profile || {
-    height: 0,
-    weight: 0,
-    age: 0,
-    gender: 'male',
-    activityLevel: 'moderate',
-    dietaryRestrictions: [],
-    goal: 'maintenance',
-    workoutPreference: 'home',
-    workoutDaysPerWeek: 3,
-    subscriptionStatus: 'free'
-  });
+  const router = useRouter();
+  const [localProfile, setLocalProfile] = useState<UserProfile>(
+    profile || {
+      height: 0,
+      weight: 0,
+      age: 0,
+      gender: "male",
+      activityLevel: "moderate",
+      dietaryRestrictions: [],
+      goal: "maintenance",
+      workoutPreference: "home",
+      workoutDaysPerWeek: 3,
+      subscriptionStatus: "free",
+    }
+  );
 
   const handleSubscribe = async () => {
     setLoading(true);
@@ -32,15 +52,54 @@ export default function ProfileScreen() {
         await subscriptionService.purchasePackage(packages[0]);
       }
     } catch (error) {
-      console.error('Error subscribing:', error);
+      console.error("Error subscribing:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const saveProfile = () => {
-    console.log('Saving profile:', localProfile);
+  const saveProfile = async () => {
+    if (!user || !supabase) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from("user_profiles")
+        .upsert({
+          user_id: user.id,
+          ...localProfile,
+          updated_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Update local store
+      updateProfile(user.id, localProfile);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.replace("/(auth)/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  if (supabaseLoading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#3B82F6" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -49,10 +108,13 @@ export default function ProfileScreen() {
         <View style={styles.profileInfo}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
-              {user?.email?.[0].toUpperCase() || '?'}
+              {user?.primaryEmailAddress?.emailAddress?.[0].toUpperCase() ||
+                "?"}
             </Text>
           </View>
-          <Text style={styles.email}>{user?.email}</Text>
+          <Text style={styles.email}>
+            {user?.primaryEmailAddress?.emailAddress}
+          </Text>
         </View>
       </View>
 
@@ -62,15 +124,17 @@ export default function ProfileScreen() {
         <View style={styles.subscriptionCard}>
           <View style={styles.subscriptionInfo}>
             <Text style={styles.subscriptionStatus}>
-              {localProfile.subscriptionStatus === 'premium' ? 'Premium' : 'Free Plan'}
+              {localProfile.subscriptionStatus === "premium"
+                ? "Premium"
+                : "Free Plan"}
             </Text>
             <Text style={styles.subscriptionDescription}>
-              {localProfile.subscriptionStatus === 'premium'
-                ? 'You have access to all premium features'
-                : 'Upgrade to unlock all features'}
+              {localProfile.subscriptionStatus === "premium"
+                ? "You have access to all premium features"
+                : "Upgrade to unlock all features"}
             </Text>
           </View>
-          {localProfile.subscriptionStatus !== 'premium' && (
+          {localProfile.subscriptionStatus !== "premium" && (
             <TouchableOpacity
               style={styles.upgradeButton}
               onPress={handleSubscribe}
@@ -89,13 +153,15 @@ export default function ProfileScreen() {
       {/* Profile Settings */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Profile Settings</Text>
-        
+
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Age</Text>
           <TextInput
             style={styles.input}
             value={String(localProfile.age)}
-            onChangeText={(text) => setLocalProfile({ ...localProfile, age: parseInt(text) || 0 })}
+            onChangeText={(text) =>
+              setLocalProfile({ ...localProfile, age: parseInt(text) || 0 })
+            }
             keyboardType="numeric"
             placeholder="Enter your age"
           />
@@ -106,7 +172,9 @@ export default function ProfileScreen() {
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={localProfile.gender}
-              onValueChange={(value: Gender) => setLocalProfile({ ...localProfile, gender: value })}
+              onValueChange={(value: Gender) =>
+                setLocalProfile({ ...localProfile, gender: value })
+              }
               style={styles.picker}
             >
               <Picker.Item label="Male" value="male" />
@@ -122,7 +190,12 @@ export default function ProfileScreen() {
             <TextInput
               style={styles.input}
               value={String(localProfile.height)}
-              onChangeText={(text) => setLocalProfile({ ...localProfile, height: parseInt(text) || 0 })}
+              onChangeText={(text) =>
+                setLocalProfile({
+                  ...localProfile,
+                  height: parseInt(text) || 0,
+                })
+              }
               keyboardType="numeric"
               placeholder="Height"
             />
@@ -133,7 +206,12 @@ export default function ProfileScreen() {
             <TextInput
               style={styles.input}
               value={String(localProfile.weight)}
-              onChangeText={(text) => setLocalProfile({ ...localProfile, weight: parseInt(text) || 0 })}
+              onChangeText={(text) =>
+                setLocalProfile({
+                  ...localProfile,
+                  weight: parseInt(text) || 0,
+                })
+              }
               keyboardType="numeric"
               placeholder="Weight"
             />
@@ -145,7 +223,9 @@ export default function ProfileScreen() {
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={localProfile.activityLevel}
-              onValueChange={(value: ActivityLevel) => setLocalProfile({ ...localProfile, activityLevel: value })}
+              onValueChange={(value: ActivityLevel) =>
+                setLocalProfile({ ...localProfile, activityLevel: value })
+              }
               style={styles.picker}
             >
               <Picker.Item label="Sedentary" value="sedentary" />
@@ -162,7 +242,9 @@ export default function ProfileScreen() {
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={localProfile.goal}
-              onValueChange={(value: UserGoal) => setLocalProfile({ ...localProfile, goal: value })}
+              onValueChange={(value: UserGoal) =>
+                setLocalProfile({ ...localProfile, goal: value })
+              }
               style={styles.picker}
             >
               <Picker.Item label="Weight Loss" value="weightLoss" />
@@ -173,13 +255,21 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.saveButton} onPress={saveProfile}>
-          <Text style={styles.saveButtonText}>Save Changes</Text>
+        <TouchableOpacity
+          style={[styles.saveButton, loading && styles.disabledButton]}
+          onPress={saveProfile}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.saveButtonText}>Save Changes</Text>
+          )}
         </TouchableOpacity>
       </View>
 
       {/* Sign Out Button */}
-      <TouchableOpacity style={styles.signOutButton} onPress={signOut}>
+      <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
         <Ionicons name="log-out-outline" size={20} color="#EF4444" />
         <Text style={styles.signOutButtonText}>Sign Out</Text>
       </TouchableOpacity>
@@ -190,51 +280,51 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     padding: 20,
     marginBottom: 8,
   },
   profileInfo: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   avatar: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#3B82F6',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#3B82F6",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 12,
   },
   avatarText: {
     fontSize: 32,
-    fontFamily: 'Inter-Bold',
-    color: '#FFFFFF',
+    fontFamily: "Inter-Bold",
+    color: "#FFFFFF",
   },
   email: {
     fontSize: 16,
-    fontFamily: 'Inter-Medium',
-    color: '#111827',
+    fontFamily: "Inter-Medium",
+    color: "#111827",
   },
   section: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     padding: 20,
     marginBottom: 8,
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    fontFamily: "Inter-SemiBold",
+    color: "#111827",
     marginBottom: 16,
   },
   subscriptionCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#F3F4F6',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#F3F4F6",
     padding: 16,
     borderRadius: 12,
   },
@@ -243,84 +333,87 @@ const styles = StyleSheet.create({
   },
   subscriptionStatus: {
     fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    fontFamily: "Inter-SemiBold",
+    color: "#111827",
     marginBottom: 4,
   },
   subscriptionDescription: {
     fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#6B7280',
+    fontFamily: "Inter-Regular",
+    color: "#6B7280",
   },
   upgradeButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
   },
   upgradeButtonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 14,
-    fontFamily: 'Inter-Medium',
+    fontFamily: "Inter-Medium",
   },
   inputGroup: {
     marginBottom: 16,
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   halfWidth: {
-    width: '48%',
+    width: "48%",
   },
   label: {
     fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#374151',
+    fontFamily: "Inter-Medium",
+    color: "#374151",
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: "#D1D5DB",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    fontFamily: 'Inter-Regular',
-    color: '#111827',
+    fontFamily: "Inter-Regular",
+    color: "#111827",
   },
   pickerContainer: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: "#D1D5DB",
     borderRadius: 8,
   },
   picker: {
     height: 50,
   },
   saveButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     padding: 16,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 8,
   },
   saveButtonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: "Inter-SemiBold",
   },
   signOutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     padding: 16,
     gap: 8,
     marginVertical: 20,
   },
   signOutButtonText: {
-    color: '#EF4444',
+    color: "#EF4444",
     fontSize: 16,
-    fontFamily: 'Inter-Medium',
+    fontFamily: "Inter-Medium",
   },
-}); 
+  disabledButton: {
+    backgroundColor: "#D1D5DB",
+  },
+});

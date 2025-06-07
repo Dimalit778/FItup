@@ -1,120 +1,97 @@
-import { create } from 'zustand';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/src/lib/supabase';
-import * as WebBrowser from 'expo-web-browser';
-import * as AppleAuthentication from 'expo-apple-authentication';
-import { makeRedirectUri } from 'expo-auth-session';
+import { makeRedirectUri } from "expo-auth-session";
+import * as SecureStore from "expo-secure-store";
+import * as WebBrowser from "expo-web-browser";
+import { create } from "zustand";
 
 interface AuthState {
-  user: User | null;
-  session: Session | null;
-  loading: boolean;
-  setUser: (user: User | null) => void;
-  setSession: (session: Session | null) => void;
-  setLoading: (loading: boolean) => void;
-  signIn: (email: string, password: string) => Promise<void>;
+  isSignedIn: boolean;
+  isLoading: boolean;
+  user: any;
+
   signUp: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signInWithApple: () => Promise<void>;
-  initialize: () => void;
+  initialize: () => Promise<void>;
+  setIsSignedIn: (isSignedIn: boolean) => void;
+  setIsLoading: (isLoading: boolean) => void;
+  signOut: () => Promise<void>;
 }
 
 WebBrowser.maybeCompleteAuthSession();
 
 const redirectUri = makeRedirectUri({
-  scheme: 'fitup'
+  scheme: "fitup",
 });
 
 export const useAuthStore = create<AuthState>((set) => ({
+  isSignedIn: false,
+  isLoading: true,
   user: null,
-  session: null,
-  loading: true,
-  setUser: (user) => set({ user }),
-  setSession: (session) => set({ session }),
-  setLoading: (loading) => set({ loading }),
-
-  initialize: () => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      set({ 
-        session,
-        user: session?.user ?? null,
-        loading: false
-      });
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      set({ 
-        session,
-        user: session?.user ?? null,
-        loading: false
-      });
-    });
-
-    return subscription.unsubscribe;
-  },
-
-  signIn: async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
-  },
-
-  signUp: async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    if (error) throw error;
-  },
-
-  signOut: async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    set({ user: null, session: null });
-  },
-
-  resetPassword: async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-    if (error) throw error;
-  },
-
-  signInWithGoogle: async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUri,
-        skipBrowserRedirect: true,
-      }
-    });
-    if (error) throw error;
-  },
-
-  signInWithApple: async () => {
+  signUp: async (email, password) => {
+    set({ isLoading: true });
     try {
-      const credential = await AppleAuthentication.signInAsync({
-        requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
-        ],
-      });
-
-      if (credential.identityToken) {
-        const { error } = await supabase.auth.signInWithIdToken({
-          provider: 'apple',
-          token: credential.identityToken,
-        });
-        if (error) throw error;
-      }
-    } catch (error) {
-      if (error.code === 'ERR_CANCELED') {
-        // User canceled Apple Sign in
-        return;
-      }
-      throw error;
+      // Clerk auth is handled in the login screen
+      set({ isSignedIn: true });
+    } finally {
+      set({ isLoading: false });
     }
   },
-})); 
+  signInWithGoogle: async () => {
+    set({ isLoading: true });
+    try {
+      // Clerk auth is handled in the login screen
+      set({ isSignedIn: true });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  signInWithApple: async () => {
+    set({ isLoading: true });
+    try {
+      // Clerk auth is handled in the login screen
+      set({ isSignedIn: true });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  initialize: async () => {
+    set({ isLoading: true });
+    try {
+      // Clerk auth is handled in the login screen
+      set({ isSignedIn: true });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  signIn: async (email, password) => {
+    set({ isLoading: true });
+    try {
+      // Clerk auth is handled in the login screen
+      set({ isSignedIn: true });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  setIsSignedIn: (isSignedIn) => set({ isSignedIn }),
+  setIsLoading: (isLoading) => set({ isLoading }),
+  signOut: async () => set({ isSignedIn: false, user: null }),
+}));
+
+// Token cache helpers for Clerk
+export const tokenCache = {
+  async getToken(key: string) {
+    try {
+      return SecureStore.getItemAsync(key);
+    } catch (err) {
+      return null;
+    }
+  },
+  async saveToken(key: string, value: string) {
+    try {
+      return SecureStore.setItemAsync(key, value);
+    } catch (err) {
+      return;
+    }
+  },
+};
