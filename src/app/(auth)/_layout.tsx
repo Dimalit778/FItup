@@ -5,6 +5,7 @@ import { Redirect, Stack } from "expo-router";
 export default function AuthLayout() {
   const { theme } = useTheme();
   const { isSignedIn } = useAuth();
+  console.log("isSignedIn", isSignedIn);
 
   if (isSignedIn) {
     return <Redirect href="/(tabs)" />;

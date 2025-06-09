@@ -1,0 +1,7 @@
+[global]
+postgres_connection = "postgres://postgres:postgres@db.supabase.co:5432/postgres"
+
+[http_service]
+port = 8000
+headers = ["Authorization", "Content-Type"]
+cors_origins = ["*"] 

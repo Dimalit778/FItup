@@ -1,40 +1,41 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
-import {
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-
 import { useSupabase } from "@/src/contexts/supabaseProvider";
+import { Profile } from "@/src/types/supabaseTypes";
 import { useUser } from "@clerk/clerk-expo";
-import { useUserProfileStore } from "../../store/userProfileStore";
-import { useWorkoutStore } from "../../store/workoutStore";
-
-import { Ionicons } from "@expo/vector-icons";
-
-interface UserProfile {
-  name: string;
-  age: string;
-  height: string;
-  weight: string;
-  activityLevel: string;
-  fitnessGoal: string;
-}
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { ActivityIndicator, Button, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
+  console.log("HomeScreen");
   const { t } = useTranslation();
-  const { profile } = useUserProfileStore();
-  const { workouts, currentWorkout } = useWorkoutStore();
-  const { user } = useUser();
+  const { createProfile, getProfile, deleteProfile } = useSupabase();
   const { loading } = useSupabase();
-  console.log("profile", profile);
-  console.log(" full name", user?.fullName);
-  console.log("image", user?.imageUrl);
+  const { user } = useUser();
 
+  const [profile, setProfile] = useState<Profile | null>(null);
+
+  const handleCreateProfile = async () => {
+    const profile = await createProfile({
+      name: "John ",
+      last_name: "Doe",
+      age: 25,
+      gender: "male",
+      height: 180,
+      weight: 75,
+      body_form: "mesomorph",
+      activity_level: "not active",
+      fitness_goal: "build_muscle",
+      workout_experience: "beginner",
+      setup_completed: false,
+    });
+  };
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const profile = await getProfile();
+      setProfile(profile);
+    };
+    fetchProfile();
+  }, [user]);
   if (loading) {
     return (
       <View style={styles.container}>
@@ -43,36 +44,39 @@ export default function HomeScreen() {
     );
   }
 
-  if (!profile || !user) {
+  if (!user) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Welcome to FitUp!</Text>
-        <Text style={styles.subtitle}>
-          Please complete your profile to get started
-        </Text>
+        <Text style={styles.subtitle}>Please complete your profile to get started</Text>
       </View>
     );
   }
+  useEffect(() => {
+    console.log("use effect (tabs) index");
+  }, []);
 
   return (
     <ScrollView style={styles.container}>
       {/* User Overview */}
       <View style={styles.section}>
-        <Text style={styles.greeting}>
-          Hello, {user.primaryEmailAddress?.emailAddress}! 👋
-        </Text>
-        <Text style={styles.goalText}>Goal: {profile.goal}</Text>
+        <Text style={styles.greeting}>Hello, {user.primaryEmailAddress?.emailAddress}! 👋</Text>
+        <Text style={styles.goalText}>Goal: {profile?.fitness_goal} </Text>
+        <Text style={styles.goalText}>Age: {profile?.age} </Text>
+        <Text style={styles.goalText}>Height: {profile?.height} </Text>
+        <Text style={styles.goalText}>Weight: {profile?.weight} </Text>
+        <Text style={styles.goalText}>Activity Level: {profile?.activity_level} </Text>
+        <Button title="Create Profile" onPress={handleCreateProfile} />
+        <Button title="Delete Profile" onPress={deleteProfile} />
       </View>
 
       {/* Today's Workout */}
-      <View style={styles.section}>
+      {/* <View style={styles.section}>
         <Text style={styles.sectionTitle}>Today's Workout</Text>
         {currentWorkout ? (
           <View style={styles.workoutCard}>
             <Text style={styles.workoutName}>{currentWorkout.name}</Text>
-            <Text style={styles.workoutDuration}>
-              {currentWorkout.duration} minutes
-            </Text>
+            <Text style={styles.workoutDuration}>{currentWorkout.duration} minutes</Text>
             <TouchableOpacity style={styles.startButton}>
               <Text style={styles.startButtonText}>Start Workout</Text>
             </TouchableOpacity>
@@ -83,10 +87,10 @@ export default function HomeScreen() {
             <Text style={styles.generateButtonText}>Generate Workout Plan</Text>
           </TouchableOpacity>
         )}
-      </View>
+      </View> */}
 
       {/* Progress Overview */}
-      <View style={styles.section}>
+      {/* <View style={styles.section}>
         <Text style={styles.sectionTitle}>Progress Overview</Text>
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
@@ -104,7 +108,7 @@ export default function HomeScreen() {
             <Text style={styles.statLabel}>Status</Text>
           </View>
         </View>
-      </View>
+      </View> */}
     </ScrollView>
   );
 }

@@ -1,30 +1,12 @@
 import { useRouter } from "expo-router";
 import React from "react";
-import {
-  Dimensions,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme } from "@/src/contexts/ThemeContext";
-import { useClerk } from "@clerk/clerk-expo";
 
 import { LinearGradient } from "expo-linear-gradient";
-import {
-  ArrowRight,
-  Dumbbell,
-  Moon,
-  Star,
-  Sun,
-  Target,
-  TrendingUp,
-  Users,
-} from "lucide-react-native";
+import { ArrowRight, Dumbbell, Moon, Star, Sun, Target, TrendingUp, Users } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 
 const { width, height } = Dimensions.get("window");
@@ -84,8 +66,6 @@ export default function LandingScreen() {
 
   const styles = createStyles(theme);
 
-  const { signOut } = useClerk();
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -93,11 +73,7 @@ export default function LandingScreen() {
         <View style={styles.header}>
           <Text style={styles.logo}>FitFlow</Text>
           <TouchableOpacity onPress={toggleTheme} style={styles.themeToggle}>
-            {isDark ? (
-              <Sun color={theme.colors.text} size={24} />
-            ) : (
-              <Moon color={theme.colors.text} size={24} />
-            )}
+            {isDark ? <Sun color={theme.colors.text} size={24} /> : <Moon color={theme.colors.text} size={24} />}
           </TouchableOpacity>
         </View>
 
@@ -111,29 +87,16 @@ export default function LandingScreen() {
           >
             <View style={styles.heroContent}>
               <Text style={styles.heroTitle}>{t("landing.hero.title")}</Text>
-              <Text style={styles.heroSubtitle}>
-                {t("landing.hero.subtitle")}
-              </Text>
+              <Text style={styles.heroSubtitle}>{t("landing.hero.subtitle")}</Text>
 
               <View style={styles.heroButtons}>
-                <TouchableOpacity
-                  style={styles.primaryButton}
-                  onPress={() => router.push("/sign-up")}
-                >
-                  <Text style={styles.primaryButtonText}>
-                    {t("landing.getStarted")}
-                  </Text>
+                <TouchableOpacity style={styles.primaryButton} onPress={() => router.push("/sign-up")}>
+                  <Text style={styles.primaryButtonText}>{t("landing.getStarted")}</Text>
                   <ArrowRight color="#FFFFFF" size={20} />
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.secondaryButton}
-                  // onPress={() => router.push("/login")}
-                  onPress={() => signOut()}
-                >
-                  <Text style={styles.secondaryButtonText}>
-                    {t("landing.signIn")}
-                  </Text>
+                <TouchableOpacity style={styles.secondaryButton} onPress={() => router.push("/login")}>
+                  <Text style={styles.secondaryButtonText}>{t("landing.signIn")}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -151,18 +114,14 @@ export default function LandingScreen() {
         {/* Features Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("landing.features.title")}</Text>
-          <Text style={styles.sectionSubtitle}>
-            {t("landing.features.subtitle")}
-          </Text>
+          <Text style={styles.sectionSubtitle}>{t("landing.features.subtitle")}</Text>
 
           <View style={styles.featuresGrid}>
             {features.map((feature, index) => (
               <View key={index} style={styles.featureCard}>
                 <View style={styles.featureIcon}>{feature.icon}</View>
                 <Text style={styles.featureTitle}>{feature.title}</Text>
-                <Text style={styles.featureDescription}>
-                  {feature.description}
-                </Text>
+                <Text style={styles.featureDescription}>{feature.description}</Text>
               </View>
             ))}
           </View>
@@ -181,15 +140,11 @@ export default function LandingScreen() {
               </View>
               <View style={styles.statItem}>
                 <Text style={styles.statNumber}>1M+</Text>
-                <Text style={styles.statLabel}>
-                  {t("landing.stats.workouts")}
-                </Text>
+                <Text style={styles.statLabel}>{t("landing.stats.workouts")}</Text>
               </View>
               <View style={styles.statItem}>
                 <Text style={styles.statNumber}>95%</Text>
-                <Text style={styles.statLabel}>
-                  {t("landing.stats.satisfaction")}
-                </Text>
+                <Text style={styles.statLabel}>{t("landing.stats.satisfaction")}</Text>
               </View>
             </View>
           </LinearGradient>
@@ -197,37 +152,19 @@ export default function LandingScreen() {
 
         {/* Testimonials Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {t("landing.testimonials.title")}
-          </Text>
-          <Text style={styles.sectionSubtitle}>
-            {t("landing.testimonials.subtitle")}
-          </Text>
+          <Text style={styles.sectionTitle}>{t("landing.testimonials.title")}</Text>
+          <Text style={styles.sectionSubtitle}>{t("landing.testimonials.subtitle")}</Text>
 
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.testimonialsScroll}
-          >
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.testimonialsScroll}>
             {testimonials.map((testimonial, index) => (
               <View key={index} style={styles.testimonialCard}>
                 <View style={styles.testimonialHeader}>
-                  <Image
-                    source={{ uri: testimonial.image }}
-                    style={styles.testimonialAvatar}
-                  />
+                  <Image source={{ uri: testimonial.image }} style={styles.testimonialAvatar} />
                   <View style={styles.testimonialInfo}>
-                    <Text style={styles.testimonialName}>
-                      {testimonial.name}
-                    </Text>
+                    <Text style={styles.testimonialName}>{testimonial.name}</Text>
                     <View style={styles.testimonialRating}>
                       {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star
-                          key={i}
-                          color={theme.colors.warning}
-                          size={16}
-                          fill={theme.colors.warning}
-                        />
+                        <Star key={i} color={theme.colors.warning} size={16} fill={theme.colors.warning} />
                       ))}
                     </View>
                   </View>
@@ -249,13 +186,8 @@ export default function LandingScreen() {
             <Text style={styles.ctaTitle}>{t("landing.cta.title")}</Text>
             <Text style={styles.ctaSubtitle}>{t("landing.cta.subtitle")}</Text>
 
-            <TouchableOpacity
-              style={styles.ctaButton}
-              onPress={() => router.push("/sign-up")}
-            >
-              <Text style={styles.ctaButtonText}>
-                {t("landing.cta.button")}
-              </Text>
+            <TouchableOpacity style={styles.ctaButton} onPress={() => router.push("/sign-up")}>
+              <Text style={styles.ctaButtonText}>{t("landing.cta.button")}</Text>
               <ArrowRight color={theme.colors.primary} size={20} />
             </TouchableOpacity>
           </LinearGradient>
@@ -263,9 +195,7 @@ export default function LandingScreen() {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            © 2024 FitFlow. All rights reserved.
-          </Text>
+          <Text style={styles.footerText}>© 2024 FitFlow. All rights reserved.</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

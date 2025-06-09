@@ -1,6 +1,6 @@
 import { useTheme } from "@/src/contexts/ThemeContext";
 import { useAuthStore } from "@/src/store/authStore";
-import { syncUserWithSupabase } from "@/src/utils/supabase";
+
 import { useSignUp, useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
@@ -69,8 +69,6 @@ export default function SignUpScreen() {
       // Sync user with Supabase
       if (user) {
         console.log("start", user);
-        await syncUserWithSupabase(user);
-        console.log("synced user with supabase", user);
       }
 
       router.replace("/(tabs)");
