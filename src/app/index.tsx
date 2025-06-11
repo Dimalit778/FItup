@@ -1,15 +1,11 @@
-import { useRouter } from "expo-router";
-import React from "react";
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
 import { useTheme } from "@/src/contexts/ThemeContext";
-
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import { ArrowRight, Dumbbell, Moon, Star, Sun, Target, TrendingUp, Users } from "lucide-react-native";
+import React from "react";
 import { useTranslation } from "react-i18next";
-
-const { width, height } = Dimensions.get("window");
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScreenWrapper } from "../components/ScreenWrapper";
 
 export default function LandingScreen() {
   const { t } = useTranslation();
@@ -67,8 +63,8 @@ export default function LandingScreen() {
   const styles = createStyles(theme);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+    <ScreenWrapper>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.logo}>FitFlow</Text>
@@ -198,7 +194,7 @@ export default function LandingScreen() {
           <Text style={styles.footerText}>© 2024 FitFlow. All rights reserved.</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 }
 
@@ -207,6 +203,7 @@ const createStyles = (theme: any) =>
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
+      paddingTop: theme.spacing.lg,
     },
     header: {
       flexDirection: "row",
@@ -315,7 +312,7 @@ const createStyles = (theme: any) =>
       gap: theme.spacing.md,
     },
     featureCard: {
-      width: (width - theme.spacing.lg * 2 - theme.spacing.md) / 2,
+      width: "48%",
       backgroundColor: theme.colors.card,
       padding: theme.spacing.lg,
       borderRadius: theme.borderRadius.lg,

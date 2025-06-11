@@ -1,73 +1,56 @@
-import { useSupabase } from "@/src/contexts/supabaseProvider";
-import { Profile } from "@/src/types/supabaseTypes";
-import { useUser } from "@clerk/clerk-expo";
+import { useSupabase } from "@/src/contexts/SupabaseContext";
+import { Profile } from "@/src/utils/supabaseTypes";
+import { useAuth, useUser } from "@clerk/clerk-expo";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Button, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Button, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   console.log("HomeScreen");
   const { t } = useTranslation();
-  const { createProfile, getProfile, deleteProfile } = useSupabase();
-  const { loading } = useSupabase();
+  const { profile, createProfile } = useSupabase();
   const { user } = useUser();
+  const { signOut } = useAuth();
+  const [profileData, setProfileData] = useState<Profile | null>(null);
 
-  const [profile, setProfile] = useState<Profile | null>(null);
-
+  useEffect(() => {
+    const loadProfile = async () => {
+      const data = await profile();
+      if (data) {
+        setProfileData(data);
+      }
+    };
+    loadProfile();
+  }, [profile]);
   const handleCreateProfile = async () => {
-    const profile = await createProfile({
-      name: "John ",
-      last_name: "Doe",
-      age: 25,
+    const data = await createProfile({
+      clerk_user_id: user?.id,
+      name: user?.firstName,
+      age: 20,
       gender: "male",
       height: 180,
-      weight: 75,
-      body_form: "mesomorph",
-      activity_level: "not active",
-      fitness_goal: "build_muscle",
-      workout_experience: "beginner",
-      setup_completed: false,
+      weight: 70,
+      body_form: "skinny",
+      activity_level: "active",
+      fitness_goal: "lose_weight",
+      setup_completed: true,
+      avatar_url: "https://via.placeholder.com/150",
     });
+    setProfileData(data);
   };
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const profile = await getProfile();
-      setProfile(profile);
-    };
-    fetchProfile();
-  }, [user]);
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#3B82F6" />
-      </View>
-    );
-  }
-
-  if (!user) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Welcome to FitUp!</Text>
-        <Text style={styles.subtitle}>Please complete your profile to get started</Text>
-      </View>
-    );
-  }
-  useEffect(() => {
-    console.log("use effect (tabs) index");
-  }, []);
-
   return (
     <ScrollView style={styles.container}>
       {/* User Overview */}
       <View style={styles.section}>
-        <Text style={styles.greeting}>Hello, {user.primaryEmailAddress?.emailAddress}! 👋</Text>
-        <Text style={styles.goalText}>Goal: {profile?.fitness_goal} </Text>
-        <Text style={styles.goalText}>Age: {profile?.age} </Text>
-        <Text style={styles.goalText}>Height: {profile?.height} </Text>
-        <Text style={styles.goalText}>Weight: {profile?.weight} </Text>
-        <Text style={styles.goalText}>Activity Level: {profile?.activity_level} </Text>
+        <Text style={styles.greeting}>Hello, {user?.primaryEmailAddress?.emailAddress}! 👋</Text>
+        <Text style={styles.goalText}>Goal: {profileData?.fitness_goal} </Text>
+        <Text style={styles.goalText}>Age: {profileData?.age} </Text>
+        <Text style={styles.goalText}>Height: {profileData?.height} </Text>
+        <Text style={styles.goalText}>Weight: {profileData?.weight} </Text>
+        <Text style={styles.goalText}>Activity Level: {profileData?.activity_level} </Text>
         <Button title="Create Profile" onPress={handleCreateProfile} />
-        <Button title="Delete Profile" onPress={deleteProfile} />
+        <Button title="logout" onPress={() => signOut()} />
+        {/* <Button title="Delete Profile" onPress={deleteProfile} /> */}
       </View>
 
       {/* Today's Workout */}

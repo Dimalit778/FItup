@@ -1,5 +1,5 @@
 import Purchases, { PurchasesPackage } from 'react-native-purchases';
-import { useUserProfileStore } from '../store/userProfileStore';
+import { useUserProfileStore } from '../../src/store/userProfileStore';
 
 const REVENUE_CAT_API_KEY = process.env.EXPO_PUBLIC_REVENUE_CAT_API_KEY || '';
 

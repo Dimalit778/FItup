@@ -1,11 +1,11 @@
+import type {
+  DailyTriggerInput,
+  DateTriggerInput,
+  NotificationTriggerInput
+} from 'expo-notifications';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import type { UserProfile } from '../types/user';
-import type { 
-  NotificationTriggerInput,
-  DailyTriggerInput,
-  DateTriggerInput
-} from 'expo-notifications';
+import type { UserProfile } from '../../src/types/user';
 
 // Configure notifications
 Notifications.setNotificationHandler({

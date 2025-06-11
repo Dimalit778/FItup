@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { ExerciseApi } from '../api/exerciseApi';
-import { ExerciseFilters } from '../types/exercise';
+
 
 export const QUERY_KEYS = {
   exercises: 'exercises',

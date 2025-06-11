@@ -1,13 +1,10 @@
 import { useTheme } from "@/src/contexts/ThemeContext";
-import { useAuthStore } from "@/src/store/authStore";
-
 import { useSignUp, useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignUpScreen() {
   const { signUp, setActive, isLoaded } = useSignUp();
@@ -21,7 +18,6 @@ export default function SignUpScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const setIsSignedIn = useAuthStore((state) => state.setIsSignedIn);
 
   const validateForm = () => {
     if (!firstName.trim()) {
@@ -61,16 +57,8 @@ export default function SignUpScreen() {
         emailAddress: email,
         password,
       });
-
       // await completeSignUp.prepareEmailAddressVerification();
       await setActive({ session: completeSignUp.createdSessionId });
-      setIsSignedIn(true);
-
-      // Sync user with Supabase
-      if (user) {
-        console.log("start", user);
-      }
-
       router.replace("/(tabs)");
     } catch (err: any) {
       setError(err.message || "Something went wrong");
@@ -99,11 +87,9 @@ export default function SignUpScreen() {
   const styles = createStyles(theme);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => router.push("/")}
-      >
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
+      {/* <SafeAreaView style={styles.container}> */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push("/")}>
         <ArrowLeft size={24} color={theme.colors.text} />
       </TouchableOpacity>
 
@@ -120,6 +106,8 @@ export default function SignUpScreen() {
               value={firstName}
               onChangeText={setFirstName}
               autoCapitalize="words"
+              autoComplete="off"
+              textContentType="givenName"
             />
             <TextInput
               style={[styles.input, styles.halfInput]}
@@ -128,6 +116,8 @@ export default function SignUpScreen() {
               value={lastName}
               onChangeText={setLastName}
               autoCapitalize="words"
+              autoComplete="off"
+              textContentType="familyName"
             />
           </View>
 
@@ -139,6 +129,8 @@ export default function SignUpScreen() {
             onChangeText={setEmail}
             autoCapitalize="none"
             keyboardType="email-address"
+            autoComplete="off"
+            textContentType="username"
           />
           <TextInput
             style={styles.input}
@@ -147,6 +139,8 @@ export default function SignUpScreen() {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            autoComplete="off"
+            textContentType="oneTimeCode"
           />
           <TextInput
             style={styles.input}
@@ -155,6 +149,8 @@ export default function SignUpScreen() {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
+            autoComplete="off"
+            textContentType="oneTimeCode"
           />
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -164,9 +160,7 @@ export default function SignUpScreen() {
             onPress={onSignUpPress}
             disabled={loading}
           >
-            <Text style={styles.buttonText}>
-              {loading ? "Creating account..." : "Create Account"}
-            </Text>
+            <Text style={styles.buttonText}>{loading ? "Creating account..." : "Create Account"}</Text>
           </TouchableOpacity>
 
           <View style={styles.divider}>
@@ -183,17 +177,13 @@ export default function SignUpScreen() {
             <Text style={styles.googleButtonText}>Continue with Google</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.linkButton}
-            onPress={() => router.push("/login")}
-          >
-            <Text style={styles.linkText}>
-              Already have an account? Sign in
-            </Text>
+          <TouchableOpacity style={styles.linkButton} onPress={() => router.navigate("/login")}>
+            <Text style={styles.linkText}>Already have an account? Sign in</Text>
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+      {/* </SafeAreaView> */}
+    </KeyboardAvoidingView>
   );
 }
 

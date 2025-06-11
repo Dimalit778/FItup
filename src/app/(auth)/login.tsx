@@ -1,23 +1,19 @@
 import { useTheme } from "@/src/contexts/ThemeContext";
-import { useAuthStore } from "@/src/store/authStore";
-import { useSignIn, useUser } from "@clerk/clerk-expo";
+import { useSignIn } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginScreen() {
   const { signIn, setActive, isLoaded } = useSignIn();
-  const { user } = useUser();
   const { theme } = useTheme();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const setIsSignedIn = useAuthStore((state) => state.setIsSignedIn);
 
   const onSignInPress = async () => {
     if (!isLoaded) return;
@@ -31,7 +27,6 @@ export default function LoginScreen() {
       });
 
       await setActive({ session: completeSignIn.createdSessionId });
-      setIsSignedIn(true);
 
       // Sync user with Supabase
       router.replace("/(tabs)");
@@ -63,10 +58,7 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => router.push("/")}
-      >
+      <TouchableOpacity style={styles.backButton} onPress={() => router.navigate("/")}>
         <ArrowLeft size={24} color={theme.colors.text} />
       </TouchableOpacity>
 
@@ -83,6 +75,8 @@ export default function LoginScreen() {
             onChangeText={setEmail}
             autoCapitalize="none"
             keyboardType="email-address"
+            autoComplete="off"
+            textContentType="username"
           />
           <TextInput
             style={styles.input}
@@ -91,6 +85,8 @@ export default function LoginScreen() {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            autoComplete="off"
+            textContentType="oneTimeCode"
           />
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -100,9 +96,7 @@ export default function LoginScreen() {
             onPress={onSignInPress}
             disabled={loading}
           >
-            <Text style={styles.buttonText}>
-              {loading ? "Signing in..." : "Sign In"}
-            </Text>
+            <Text style={styles.buttonText}>{loading ? "Signing in..." : "Sign In"}</Text>
           </TouchableOpacity>
 
           <View style={styles.divider}>
@@ -119,10 +113,7 @@ export default function LoginScreen() {
             <Text style={styles.googleButtonText}>Continue with Google</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.linkButton}
-            onPress={() => router.push("/sign-up")}
-          >
+          <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/sign-up")}>
             <Text style={styles.linkText}>Don't have an account? Sign up</Text>
           </TouchableOpacity>
         </View>

@@ -1,6 +1,4 @@
 import OpenAI from 'openai';
-import { UserProfile } from '../types/user';
-import { Workout } from '../store/workoutStore';
 
 const openai = new OpenAI({
   apiKey: process.env.EXPO_PUBLIC_OPENAI_API_KEY || '',
